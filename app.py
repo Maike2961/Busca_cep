@@ -1,6 +1,5 @@
 import requests
 
-cont = 0
 
 def cep():
     while True:
@@ -11,11 +10,12 @@ def cep():
         if(len(cep) == 8):
             print(resp.json())
             continua = input("Deseja continua: S/N ")
-            if(continua == 'S' or continua == 's'):
-                cont =+ 1
+            if(continua == 'S' or continua == 's'): 
                 continue
             elif(continua == "N" or continua == "n"):
                 break
+        elif(len(cep) < 8 or len(cep) >8):
+            print("Digite corretamente o cep desejado")
         else:
             print("Erro, tente novamente")
             
