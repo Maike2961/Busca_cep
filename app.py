@@ -1,6 +1,5 @@
 import requests
 
-
 def cep():
     while True:
         cep = input("Digite seu cep: ")
@@ -23,6 +22,8 @@ def cep():
                     continue
                 elif(continua == "N" or continua == "n"):
                     break
+                else:
+                    print("Digite somente sim ou não")
             except:
                 print("Erro no cep, tente novamente")
         elif(len(cep) > 8 or len(cep) < 8):
