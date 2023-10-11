@@ -1,21 +1,32 @@
 import requests
 
-cont = 0
 
 def cep():
     while True:
         cep = input("Digite seu cep: ")
         link_cep = f'https://viacep.com.br/ws/{cep}/json/'
         resp = requests.get(link_cep)
-        print(len(cep))
         if(len(cep) == 8):
-            print(resp.json())
-            continua = input("Deseja continua: S/N ")
-            if(continua == 'S' or continua == 's'):
-                cont =+ 1
-                continue
-            elif(continua == "N" or continua == "n"):
-                break
+            try:
+                dicta = resp.json()
+                Cep = 'O cep é: ' + dicta['cep'] 
+                logradouro = "O logradouro é: " + dicta['logradouro']
+                bairro = "O bairro é: " + dicta['bairro']
+                cidade = "Cidade de: " + dicta['localidade']
+                DDD = "O ddd do local é: " + dicta['ddd']
+                uf = "UF: " + dicta['uf']
+
+                print(Cep, logradouro, bairro, cidade, uf, DDD, sep='\n')
+
+                continua = input("Deseja continuar S/N: ")
+                if(continua == 'S' or continua == 's'):
+                    continue
+                elif(continua == "N" or continua == "n"):
+                    break
+            except:
+                print("Erro no cep")
+        elif(len(cep) > 8 or len(cep) < 8):
+            print("Digite corretamente o cep desejado")
         else:
             print("Erro, tente novamente")
             
