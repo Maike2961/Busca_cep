@@ -24,7 +24,7 @@ def cep():
                 elif(continua == "N" or continua == "n"):
                     break
             except:
-                print("Erro no cep")
+                print("Erro no cep, tente novamente")
         elif(len(cep) > 8 or len(cep) < 8):
             print("Digite corretamente o cep desejado")
         else:
