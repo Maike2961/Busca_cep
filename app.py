@@ -1,38 +1,46 @@
+from flask import Flask, request,flash, render_template, jsonify
+from flask_sqlalchemy import SQLAlchemy
 import requests
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///banco.db"
+app.config["SECRET_KEY "] = "its privace man"
+db = SQLAlchemy(app)
 
-def cep():
-    while True:
-        cep = input("Digite seu cep: ")
+class cadastro_cep(db.Model):
+    __tablename__= "Cep"
+    id = db.Column(db.Integer, primary_key=True)
+    num_cep = db.Column(db.String(8))
+    logradouro = db.Column(db.String(50))
+    bairro = db.Column(db.String(30))
+    cidade = db.Column(db.String(40))
+    ddd = db.Column(db.String(5))
+    uf = db.Column(db.String(4))
+    
+
+@app.route("/busca", methods=["GET", "POST"])
+def busca_cep():
+    if request.method == "POST":
+        cep = request.form["cep"]
         link_cep = f'https://viacep.com.br/ws/{cep}/json/'
         resp = requests.get(link_cep)
-        if(len(cep) == 8):
-            try:
-                dicta = resp.json()
-                Cep = 'O cep é: ' + dicta['cep'] 
-                logradouro = "O logradouro é: " + dicta['logradouro']
-                bairro = "O bairro é: " + dicta['bairro']
-                cidade = "Cidade de: " + dicta['localidade']
-                DDD = "O ddd do local é: " + dicta['ddd']
-                uf = "UF: " + dicta['uf']
+        try:
+            dicta = resp.json()
+            print(dicta)
+            salv = cadastro_cep()
+            salv.num_cep = dicta['cep']
+            salv.cidade = dicta['localidade']
+            salv.bairro = dicta['bairro']
+            salv.logradouro = dicta['logradouro']
+            salv.uf = dicta['uf']
+            salv.ddd = dicta['ddd']
+            db.session.commit()
+        except:
+            print("Erro na requisição")
+    else:
+        print("Erro de conexão")
+    return render_template('index.html')
 
-                print(Cep, logradouro, bairro, cidade, uf, DDD, sep='\n')
-
-                continua = input("Deseja continuar S/N: ")
-                if(continua == 'S' or continua == 's'):
-                    continue
-                elif(continua == "N" or continua == "n"):
-                    break
-                else:
-                    print("Digite somente sim ou não")
-            except:
-                print("Erro no cep, tente novamente")
-        elif(len(cep) > 8 or len(cep) < 8):
-            print("Digite corretamente o cep desejado")
-        else:
-            print("Erro, tente novamente")
-            
-if __name__ == '__main__':
-    cep()
-
-
-    
+if __name__ == "__main__":
+    delet = cadastro_cep.query.all()
+    db.session.remove(delet)
+    app.run(debug=True, host="localhost", port=8500)
