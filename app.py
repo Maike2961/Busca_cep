@@ -1,4 +1,4 @@
-from flask import Flask, request,flash, render_template, jsonify
+from flask import Flask, request,flash, render_template, jsonify,url_for,redirect
 from flask_sqlalchemy import SQLAlchemy
 import requests
 app = Flask(__name__)
@@ -15,7 +15,10 @@ class cadastro_cep(db.Model):
     cidade = db.Column(db.String(40))
     ddd = db.Column(db.String(5))
     uf = db.Column(db.String(4))
-    
+
+@app.route("/")
+def index():
+    return redirect("/busca")
 
 @app.route("/busca", methods=["GET", "POST"])
 def busca_cep():
@@ -33,6 +36,7 @@ def busca_cep():
             salv.logradouro = dicta['logradouro']
             salv.uf = dicta['uf']
             salv.ddd = dicta['ddd']
+            db.session.add(salv)
             db.session.commit()
         except:
             print("Erro na requisição")
@@ -41,6 +45,4 @@ def busca_cep():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    delet = cadastro_cep.query.all()
-    db.session.remove(delet)
     app.run(debug=True, host="localhost", port=8500)
