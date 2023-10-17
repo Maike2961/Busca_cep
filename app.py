@@ -44,5 +44,21 @@ def busca_cep():
         print("Erro de conexão")
     return render_template('index.html')
 
+@app.route("/lista/consulta", methods=["GET", "POST"])
+def lista():
+    lista = cadastro_cep.query.all()
+    list2 = []
+    for cadast in lista:
+        listaObj = {}
+        listaObj["id"] = cadast.id
+        listaObj["cep"] = cadast.num_cep
+        listaObj["localidade"] = cadast.cidade
+        listaObj["bairro"] = cadast.bairro
+        listaObj["uf"] = cadast.uf
+        listaObj["logradouro"] = cadast.logradouro
+        listaObj["ddd"] = cadast.ddd
+        list2.append(listaObj)
+        return jsonify({"dados":list2})
+
 if __name__ == "__main__":
     app.run(debug=True, host="localhost", port=8500)
