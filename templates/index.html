@@ -12,11 +12,50 @@
         <div class="form-row">
             <h2>Busca CEP</h2>
             <div class="form-group col-md-10" >
-                <input type="text" class="form-control" aria-describedby="emailHelp" name="cep" placeholder="Digite seu CEP" maxlength="8">
+                <input type="number" class="form-control" aria-describedby="emailHelp" name="cep" placeholder="Digite seu CEP" maxlength="8">
                 <button type="submit" class="btn btn-primary">Enviar</button>
             </div>
         </div>
     </form>
+    <table class="table table-striped">
+        
+     <thead>
+        <tr>
+            <th scope="col">Nome Rua</th>
+            <th scope="col">Bairro</th>
+            <th scope="col">Cidade</th>
+            <th scope="col">UF</th>
+            <th scope="col">CEP</th>
+            <th scope="col">DDD</th>
+        </tr>
+    </thead> 
+
+    {%for mens in get_flashed_messages()%}
+    <div class="container text-center">
+        <h3>{{mens}}</h3>
+    </div>
+    {%endfor%}
+
+    <div class="container text-center">
+        <div class="row">
+            <tbody id="tabela"></tbody>
+        </div>
+    </div>
+    </table>
+    <script>
+        
+    let tabela = document.getElementById("tabela")    
+    fetch("/lista/consulta").then(resp => resp.json()).then(function(data){
+        console.table(data)
+        let consultaHTML =""
+        for(let td of data.dados){
+            consultaHTML+=`<tr><td>`+ td.logradouro+ `</td><td>`+ td.bairro+`</td><td>` +td.localidade+`</td><td>`+
+            td.uf +`</td><td>`+ td.cep+`</td><td>`+td.ddd+`</td></tr>`
+        }
+        tabela.innerHTML = consultaHTML
+    })
+
+    </script>
     
 </body>
 </html>

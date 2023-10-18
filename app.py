@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///banco.db"
-app.config["SECRET_KEY "] = "its privace man"
+app.config["SECRET_KEY"] = "#rf5"
 db = SQLAlchemy(app)
 
 class cadastro_cep(db.Model):
@@ -18,6 +18,7 @@ class cadastro_cep(db.Model):
 
 @app.route("/")
 def index():
+    remove()
     return redirect("/busca")
 
 @app.route("/busca", methods=["GET", "POST"])
@@ -26,20 +27,24 @@ def busca_cep():
         cep = request.form["cep"]
         link_cep = f'https://viacep.com.br/ws/{cep}/json/'
         resp = requests.get(link_cep)
-        try:
-            dicta = resp.json()
-            print(dicta)
-            salv = cadastro_cep()
-            salv.num_cep = dicta['cep']
-            salv.cidade = dicta['localidade']
-            salv.bairro = dicta['bairro']
-            salv.logradouro = dicta['logradouro']
-            salv.uf = dicta['uf']
-            salv.ddd = dicta['ddd']
-            db.session.add(salv)
-            db.session.commit()
-        except:
-            print("Erro na requisição")
+        if(len(cep) == 8):
+            try:
+                dicta = resp.json()
+                salv = cadastro_cep()
+                salv.num_cep = dicta['cep']
+                salv.cidade = dicta['localidade']
+                salv.bairro = dicta['bairro']
+                salv.logradouro = dicta['logradouro']
+                salv.uf = dicta['uf']
+                salv.ddd = dicta['ddd']
+                db.session.add(salv)
+                db.session.commit()
+            except:
+                print("Erro na requisição")
+        elif(len(cep) > 8 or len(cep) < 8):
+            flash("Digite corretamente o cep desejado")
+        else:
+            flash("Erro tente novamente")
     else:
         print("Erro de conexão")
     return render_template('index.html')
@@ -58,7 +63,12 @@ def lista():
         listaObj["logradouro"] = cadast.logradouro
         listaObj["ddd"] = cadast.ddd
         list2.append(listaObj)
-        return jsonify({"dados":list2})
+    return jsonify({"dados":list2})
+
+def remove():
+    db.session.query(cadastro_cep).delete()
+    db.session.commit()
+    return "Deletado"
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=8500)
+    app.run(debug=True, host="localhost", port=8500,)
